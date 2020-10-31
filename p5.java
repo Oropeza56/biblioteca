@@ -65,16 +65,18 @@ class Libro{
 class Alumno{
 	String nombre;
 	int numCuenta;
+	int dias;
 	ArrayList<Libro> librosPrestados= new ArrayList<Libro>();
 
 	Alumno(){
 		super();
 	}
 
-	Alumno(String nombre, int numCuenta){
+	Alumno(String nombre, int numCuenta, int dias){
 		super();
 		this.nombre= nombre;
 		this.numCuenta=numCuenta;
+		this.dias=dias;
 	}
 
 	public void setNombre (String nombre){
@@ -93,33 +95,62 @@ class Alumno{
 		return this.numCuenta;
 	}
 
-	
+	public void setDias (int dias){
+		this.dias=dias;
+	}
 
+	public int getDias(){
+		return this.dias;
+	}
+
+	public boolean addLibroPrestado(Libro newLibro){
+		librosPrestados.add(newLibro);
+		
+		if(librosPrestados.contains(newLibro)) return true;
+		return false;
+	}
+	
+	public boolean removeLibroPrestado(Libro removeLibro){
+		librosPrestados.remove(removeLibro);
+		
+		if(!librosPrestados.contains(removeLibro)) return true;
+		return false;
+	}
+	
+	public String allLibrosPrestados(){
+		return librosPrestados.toString();
+	}
 }
 
 class Bibliotecario{
-
-public boolean agregarLIbrosPrestados( Libros objLibros){
-		librosPrestados.add(objLibros);
-		if (librosPrestados.contains(objLibros)) {
-			return true;
-		}
-
-		return false;
+	
+	Alumno alumno;
+	
+	Bibliotecario(String nombreA, int numCuentaA, int diasA){
+		alumno = new Alumno(nombreA, numCuentaA, diasA);
+	}	
+	
+	public boolean agregarLIbrosPrestados(Libro objLibros){
+		return alumno.addLibroPrestado(objLibros);
 	}
 
-	public boolean entregarLibro (Libros objLibros){
-		librosPrestados.remove(objLibros);
-		if (!librosPrestados.contains(objLibros)) {
-			return true;
-		}
-		return false;
+	public boolean entregarLibro (Libro objLibros){
+		return alumno.removeLibroPrestado(objLibros);
 	}
 
-
+	public String sancionLibro (int diasA){
+		if (diasA> 7) {
+			return "Ya tienes una multa, deberas pagar $20 pesos";
+		}
+		else{ 
+			return "Lo entregaste a tiempo";
+		}
+	}
 }
 
 
 class SistemaPrestamo{
-
+	public static void main(String args[]){
+		
+	}
 }
