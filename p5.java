@@ -65,7 +65,7 @@ class Libro{
 class Alumno{
 	String nombre;
 	int numCuenta;
-	ArrayList<Libros> librosPrestados= new ArrayList<Libros>();
+	ArrayList<Libro> librosPrestados= new ArrayList<Libro>();
 
 	Alumno(){
 		super();
