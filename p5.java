@@ -93,7 +93,13 @@ class Alumno{
 		return this.numCuenta;
 	}
 
-	public boolean agregarLIbrosPrestados( Libros objLibros){
+	
+
+}
+
+class Bibliotecario{
+
+public boolean agregarLIbrosPrestados( Libros objLibros){
 		librosPrestados.add(objLibros);
 		if (librosPrestados.contains(objLibros)) {
 			return true;
@@ -109,12 +115,6 @@ class Alumno{
 		}
 		return false;
 	}
-
-}
-
-class Bibliotecario{
-
-
 
 
 }
