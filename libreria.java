@@ -24,5 +24,5 @@ public class Libreria{
 	}
 
 
-	ArrayList <Libreria> loteLibros= new ArrayList<Libreria>();
+	ArrayList <Libro> loteLibros= new ArrayList<Libro>();
 }
