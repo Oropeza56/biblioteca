@@ -93,33 +93,45 @@ class Alumno{
 		return this.numCuenta;
 	}
 
+	public boolean addLibroPrestado(Libro newLibro){
+		librosPrestados.add(newLibro);
+		
+		if(librosPrestados.constains(newLibro)) return true;
+		return false;
+	}
 	
-
+	public boolean removeLibroPrestado(Libro removeLibro){
+		librosPrestados.remove(removeLibro);
+		
+		if(!librosPrestados.contains(removeLibro)) return true;
+		return false;
+	}
+	
+	public String allLibrosPrestados(){
+		return librosPrestados.toString();
+	}
 }
 
 class Bibliotecario{
-
-public boolean agregarLIbrosPrestados( Libros objLibros){
-		librosPrestados.add(objLibros);
-		if (librosPrestados.contains(objLibros)) {
-			return true;
-		}
-
-		return false;
+	
+	Alumno alumno;
+	
+	Bibliotecario(String nombreA, int numCuentaA){
+		alumno = new Alumno(nombreA, numCuentaA);
+	}	
+	
+	public boolean agregarLIbrosPrestados(Libro objLibros){
+		return alumno.addLibroPrenstado(objLibro);
 	}
 
 	public boolean entregarLibro (Libros objLibros){
-		librosPrestados.remove(objLibros);
-		if (!librosPrestados.contains(objLibros)) {
-			return true;
-		}
-		return false;
+		return alumno.removeLibroPrestado(objLibros);
 	}
-
-
 }
 
 
 class SistemaPrestamo{
-
+	public static void main(String args[]){
+		
+	}
 }
