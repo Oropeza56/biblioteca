@@ -207,7 +207,14 @@ class SistemaPrestamo{
 
 				Libro libro = new Libro(nombre, autor, editorial);
 
-				
+				if(biblio.entregarLibro(libro, alumno)){
+					System.out.println("Se pudo regresar el libro con exito.");
+					break;
+				}
+				System.out.println("No se pudo regresar el libro con exito.");
+				break;
+			case 3:
+				break;
 			case 4:
 				break;
 		}
