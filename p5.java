@@ -1,6 +1,7 @@
 import java.util.*;
+import java.io.*;
 
-class Libro{
+class Libro implements Serializable{
 
 	String nombreL;
 	String autor;
@@ -43,7 +44,7 @@ class Libro{
 	}
 }
 
-class Alumno{
+class Alumno implements Serializable{
 	String nombre;
 	int numCuenta;
 	String password;
@@ -157,6 +158,60 @@ class Bibliotecario{
 	}
 }
 
+class Files{
+
+	public void escribirArchivo(String nombre, ArrayList<Alumno> alumno){
+		try{
+			ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(nombre));
+			os.writeObject(alumno);
+			os.close();
+		} catch (FileNotFoundException e){
+			e.printStackTrace();
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void escribirArchivo(String nombre, Libro libro){
+		try{
+			ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(nombre));
+			os.writeObject(libro);
+			os.close();
+		} catch (FileNotFoundException e){
+			e.printStackTrace();
+		} catch (IOException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void leerArchivo(String nombre, ArrayList<Alumno> alu){
+		try{
+			ObjectInputStream is = new ObjectInputStream(new FileInputStream(nombre));
+			alu = (Alumno)is.readObject();
+			is.close();
+		} catch (FileNotFoundException e){
+			e.printStackTrace();
+		} catch (IOException e){
+			e.printStackTrace();
+		} catch (ClassNotFoundException e){
+			e.printStackTrace();
+		}
+	}
+
+	public void leerArchivo(String nombre, Libro libro){
+		try{
+			ObjectInputStream is = new ObjectInputStream(new FileInputStream(nombre));
+			libro = (Libro)is.readObject();
+			is.close();
+		} catch (FileNotFoundException e){
+			e.printStackTrace();
+		} catch (IOException e){
+			e.printStackTrace();
+		} catch (ClassNotFoundException e){
+			e.printStackTrace();
+		}
+	}
+}
 
 class SistemaPrestamo{
 	ArrayList<Alumno> alumnosAlta = new ArrayList<Alumno>();
@@ -185,38 +240,38 @@ class SistemaPrestamo{
 		System.out.println("2. Devolución de libro.");
 		System.out.println("3. Renovación de libro.");
 		System.out.println("4. Cerrar Sesion");
-		
-		switch(sc.nextInt()){
-			case 1:
-				System.out.print("Nombre del libro que busca: ");
-				String nombreL = sc.next().toLowerCase();
-				if(biblio.agregarLibrosPrestados(nombreL, alumno)){
-					System.out.println("Listo, se le prestó el libro de "+nombreL+".");
+		for(;;){	
+			switch(sc.nextInt()){
+				case 1:
+					System.out.print("Nombre del libro que busca: ");
+					String nombreL = sc.next().toLowerCase();
+					if(biblio.agregarLibrosPrestados(nombreL, alumno)){
+						System.out.println("Listo, se le prestó el libro de "+nombreL+".");
+						break;
+					}
+					System.out.println("No se pudo prestar el liro debido a problemas del sistema.");
 					break;
-				}
-				System.out.println("No se pudo prestar el liro debido a problemas del sistema.");
-				break;
-			case 2:
-				System.out.print("Introduzca los datos del libro a regresar.");
-				System.out.print("Nombre: ");
-				String nombre = sc.next().toLowerCase();
-				System.out.print("Autor: ");
-				String autor = sc.next().toLowerCase();
-				System.out.print("Editorial: ");
-				String editorial = sc.next().toLowerCase();
+				case 2:
+					System.out.print("Introduzca los datos del libro a regresar.");
+					System.out.print("Nombre: ");
+					String nombre = sc.next().toLowerCase();
+					System.out.print("Autor: ");
+					String autor = sc.next().toLowerCase();
+					System.out.print("Editorial: ");
+					String editorial = sc.next().toLowerCase();
 
-				Libro libro = new Libro(nombre, autor, editorial);
+					Libro libro = new Libro(nombre, autor, editorial);
 
-				if(biblio.entregarLibro(libro, alumno)){
-					System.out.println("Se pudo regresar el libro con exito.");
+					if(biblio.entregarLibro(libro, alumno)){
+						System.out.println("Se pudo regresar el libro con exito.");
+						break;
+					}
+					System.out.println("No se pudo regresar el libro con exito.");
 					break;
-				}
-				System.out.println("No se pudo regresar el libro con exito.");
-				break;
-			case 3:
-				break;
-			case 4:
-				break;
+				case 3:
+					break;
+				case 4:
+			}
 		}
 	}
 
@@ -224,6 +279,7 @@ class SistemaPrestamo{
 		SistemaPrestamo sys = new SistemaPrestamo();
 		Scanner sc = new Scanner(System.in);
 		Alumno alu = new Alumno();
+		Files file = new Files();
 
 		for(;;){
 			System.out.println("\nHola, bienvenido a la biblioteca.");
@@ -262,9 +318,13 @@ class SistemaPrestamo{
 						break;
 					} else {
 						System.out.println("No se pudo crear porque ya existe.");
+						break;
 					}
 				case 3:
 					sc.close();
+
+					file.escribirArchivo("alumnos", sys.alumnosAlta);
+
 					System.exit(1);
 				default:
 					System.out.println("Introduzca una opción válida.");
