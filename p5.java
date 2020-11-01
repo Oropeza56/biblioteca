@@ -5,20 +5,17 @@ class Libro{
 	String nombreL;
 	String autor;
 	String editorial;
-	int pag;
-	int añoP;
 
 	Libro(){
 		super ();
 	}	
 
-	Libro (String nombreL, String autor, String editorial, int pag, int añoP ){
+	Libro (String nombreL, String autor, String editorial){
 		super();
 		this.nombreL= nombreL;
 		this.autor = autor;
 		this.editorial = editorial;
-		this.pag= pag;
-		this.añoP=añoP;
+
 	}
 
 	public void setNombreL (String nombreL){
@@ -37,34 +34,19 @@ class Libro{
 		return this.autor;
 	}
 
-	public void setEditorial (Stirng editorial){
+	public void setEditorial (String editorial){
 		this.editorial= editorial;
 	}
 
 	public String getEditorial(){
 		return this.editorial;
 	}
-
-	public void setPag (int pag){
-		this.pag= pag;
-	}
-
-	public int getPag (){
-		return this.pag;
-	}
-
-	public void setAñop (int añoP){
-		this.añoP= añoP;
-	}
-
-	public int getAñop (){
-		return this.añoP;
-	}
 }
 
 class Alumno{
 	String nombre;
 	int numCuenta;
+	String password;
 	int dias;
 	ArrayList<Libro> librosPrestados= new ArrayList<Libro>();
 
@@ -77,6 +59,18 @@ class Alumno{
 		this.nombre= nombre;
 		this.numCuenta=numCuenta;
 		this.dias=dias;
+	}
+
+	public void setPass(String password){
+		this.password = password;	
+	}
+
+	public String getPass(){
+		return this.password;
+	}
+
+	public int getNumLibros(){
+		return this.librosPrestados.size();
 	}
 
 	public void setNombre (String nombre){
@@ -124,17 +118,32 @@ class Alumno{
 
 class Bibliotecario{
 	
-	Alumno alumno;
-	
-	Bibliotecario(String nombreA, int numCuentaA, int diasA){
-		alumno = new Alumno(nombreA, numCuentaA, diasA);
-	}	
-	
-	public boolean agregarLIbrosPrestados(Libro objLibros){
-		return alumno.addLibroPrestado(objLibros);
+	ArrayList <Libro> libreria = new ArrayList<Libro>();
+
+	Bibliotecario(){
+		super();
 	}
 
-	public boolean entregarLibro (Libro objLibros){
+	private int buscarLibro(String nombre){
+		for(int i = 0; i < libreria.size(); i++){
+			if(nombre == libreria.get(i).nombreL){
+				return i;
+			}
+		}
+		return -1;
+	}
+	
+	public boolean agregarLibrosPrestados(String nombreL, Alumno alumno){
+		int i = buscarLibro(nombreL);
+		if(i != -1){
+			if(alumno.getNumLibros() <= 3){
+				return alumno.addLibroPrestado(libreria.get(i));
+			}
+		}
+		return false;
+	}
+
+	public boolean entregarLibro (Libro objLibros, Alumno alumno){
 		return alumno.removeLibroPrestado(objLibros);
 	}
 
@@ -150,7 +159,109 @@ class Bibliotecario{
 
 
 class SistemaPrestamo{
-	public static void main(String args[]){
+	ArrayList<Alumno> alumnosAlta = new ArrayList<Alumno>();
+
+	private boolean iniciarSesion(Alumno alu){
+		if(alumnosAlta.contains(alu)){
+			return true;
+		}
+		return false;
+	}
+
+	private boolean darAltaAlu(Alumno alu){
+		if(!alumnosAlta.contains(alu)){
+			alumnosAlta.add(alu);
+			return true;
+		}
+		return false;
+	}
+
+	private void menu(Alumno alumno){
+		Scanner sc = new Scanner(System.in);
+		Bibliotecario biblio = new Bibliotecario();
+
+		System.out.println("\nEliga una opción:\n");
+		System.out.println("1. Préstamo de libro.");
+		System.out.println("2. Devolución de libro.");
+		System.out.println("3. Renovación de libro.");
+		System.out.println("4. Cerrar Sesion");
 		
+		switch(sc.nextInt()){
+			case 1:
+				System.out.print("Nombre del libro que busca: ");
+				String nombreL = sc.next().toLowerCase();
+				if(biblio.agregarLibrosPrestados(nombreL, alumno)){
+					System.out.println("Listo, se le prestó el libro de "+nombreL+".");
+					break;
+				}
+				System.out.println("No se pudo prestar el liro debido a problemas del sistema.");
+				break;
+			case 2:
+				System.out.print("Introduzca los datos del libro a regresar.");
+				System.out.print("Nombre: ");
+				String nombre = sc.next().toLowerCase();
+				System.out.print("Autor: ");
+				String autor = sc.next().toLowerCase();
+				System.out.print("Editorial: ");
+				String editorial = sc.next().toLowerCase();
+
+				Libro libro = new Libro(nombre, autor, editorial);
+
+				
+			case 4:
+				break;
+		}
+	}
+
+	public static void main(String args[]){
+		SistemaPrestamo sys = new SistemaPrestamo();
+		Scanner sc = new Scanner(System.in);
+		Alumno alu = new Alumno();
+
+		for(;;){
+			System.out.println("\nHola, bienvenido a la biblioteca.");
+			System.out.println("Por favor inicia sesión o registrate.\n");
+
+			System.out.println("1. Iniciar sesión.");
+			System.out.println("2. Registrarse en el sistema.");
+			System.out.println("3. Salir");
+			int opcion = sc.nextInt();
+
+			switch(opcion){
+				case 1:
+					System.out.print("Introduzca su numero de cuenta: ");
+					alu.setNombre(sc.next());
+					System.out.print("\nIntroduzca su contraseña: ");
+					alu.setPass(sc.next());
+
+					if(sys.iniciarSesion(alu)){
+						sys.menu(alu);
+						break;
+					} else {
+						System.out.println("Datos incorrectos o no está en el sistema.");
+						break;
+					}
+				case 2:
+					System.out.print("Escriba su nombre: ");
+					alu.setNombre(sc.next());
+					System.out.print("Escriba su numero de cuenta: ");
+					alu.setNumCuenta(sc.nextInt());
+					System.out.print("Escriba su nueva contraseña: ");
+					alu.setPass(sc.next());
+
+					if(sys.darAltaAlu(alu)){
+						System.out.println("Se creó su usuario correctamemte.");
+						sys.menu(alu);
+						break;
+					} else {
+						System.out.println("No se pudo crear porque ya existe.");
+					}
+				case 3:
+					sc.close();
+					System.exit(1);
+				default:
+					System.out.println("Introduzca una opción válida.");
+			}
+		}
 	}
 }
