@@ -16,7 +16,6 @@ class Libro implements Serializable{
 		this.nombreL= nombreL;
 		this.autor = autor;
 		this.editorial = editorial;
-
 	}
 
 	public void setNombreL (String nombreL){
@@ -41,6 +40,10 @@ class Libro implements Serializable{
 
 	public String getEditorial(){
 		return this.editorial;
+	}
+
+	public String toString(){
+		return nombreL+" | "+autor+" | "+editorial;
 	}
 }
 
@@ -101,7 +104,10 @@ class Alumno implements Serializable{
 	public boolean addLibroPrestado(Libro newLibro){
 		librosPrestados.add(newLibro);
 		
-		if(librosPrestados.contains(newLibro)) return true;
+		if(librosPrestados.contains(newLibro)){
+			System.out.println("Sí");
+			return true;
+		}
 		return false;
 	}
 	
@@ -111,31 +117,42 @@ class Alumno implements Serializable{
 		if(!librosPrestados.contains(removeLibro)) return true;
 		return false;
 	}
-	
-	public String allLibrosPrestados(){
-		return librosPrestados.toString();
+
+	public String toString(){
+		return nombre+" | "+numCuenta+" | "+dias+" | "+password+" | "+librosPrestados;
 	}
 }
 
 class Bibliotecario{
 	
-	ArrayList <Libro> libreria = new ArrayList<Libro>();
+	ArrayList<Libro> libreria = new ArrayList<Libro>();
 
 	Bibliotecario(){
 		super();
+		Libro l1 = new Libro("calculo1", "pepe1", "pepinillo1");
+		Libro l2 = new Libro("calculo2", "pepe2", "pepinillo2");
+		Libro l3 = new Libro("calculo3", "pepe3", "pepinillo3");
+
+		this.libreria.add(l1);
+		this.libreria.add(l2);
+		this.libreria.add(l3);
 	}
 
 	private int buscarLibro(String nombre){
-		for(int i = 0; i < libreria.size(); i++){
-			if(nombre == libreria.get(i).nombreL){
+		System.out.println("Entré");
+		int i = 0;
+		while(i < libreria.size()){
+			System.out.println(libreria.get(i));
+			if(libreria.get(i).getNombreL().equals(nombre)){
 				return i;
 			}
-		}
-		return -1;
+			++i;
+		} return -1;
 	}
 	
 	public boolean agregarLibrosPrestados(String nombreL, Alumno alumno){
 		int i = buscarLibro(nombreL);
+		System.out.println(i);
 		if(i != -1){
 			if(alumno.getNumLibros() <= 3){
 				return alumno.addLibroPrestado(libreria.get(i));
@@ -172,10 +189,10 @@ class Files{
 		}
 	}
 
-	public void escribirArchivo(String nombre, Libro libro){
+	public void escribirArchivoL(String nombre, ArrayList<Libro> libros){
 		try{
 			ObjectOutputStream os = new ObjectOutputStream(new FileOutputStream(nombre));
-			os.writeObject(libro);
+			os.writeObject(libros);
 			os.close();
 		} catch (FileNotFoundException e){
 			e.printStackTrace();
@@ -184,11 +201,14 @@ class Files{
 		}
 	}
 
-	public void leerArchivo(String nombre, ArrayList<Alumno> alu){
+	public ArrayList<Alumno> leerArchivo(String nombre){
+		ArrayList<Alumno> alu = new ArrayList<Alumno>();
+
 		try{
 			ObjectInputStream is = new ObjectInputStream(new FileInputStream(nombre));
-			alu = (Alumno)is.readObject();
+			alu = (ArrayList<Alumno>)is.readObject();
 			is.close();
+			return alu;
 		} catch (FileNotFoundException e){
 			e.printStackTrace();
 		} catch (IOException e){
@@ -196,13 +216,17 @@ class Files{
 		} catch (ClassNotFoundException e){
 			e.printStackTrace();
 		}
+		return alu;
 	}
 
-	public void leerArchivo(String nombre, Libro libro){
+	public ArrayList<Libro> leerArchivoL(String nombre){
+		ArrayList<Libro> libreria = new ArrayList<Libro>();
+		
 		try{
 			ObjectInputStream is = new ObjectInputStream(new FileInputStream(nombre));
-			libro = (Libro)is.readObject();
+			libreria = (ArrayList<Libro>)is.readObject();
 			is.close();
+			return libreria;
 		} catch (FileNotFoundException e){
 			e.printStackTrace();
 		} catch (IOException e){
@@ -210,15 +234,25 @@ class Files{
 		} catch (ClassNotFoundException e){
 			e.printStackTrace();
 		}
+		return libreria;
 	}
 }
 
 class SistemaPrestamo{
 	ArrayList<Alumno> alumnosAlta = new ArrayList<Alumno>();
 
-	private boolean iniciarSesion(Alumno alu){
-		if(alumnosAlta.contains(alu)){
-			return true;
+	private boolean iniciarSesion(int numCuenta, String pass, Alumno alu){
+	
+		for (Alumno alumno : alumnosAlta){
+			if(alumno.numCuenta == numCuenta){
+				if(alumno.password.equals(pass)){
+					alu.setNombre(alumno.getNombre());
+					alu.setNumCuenta(alumno.getNumCuenta());
+					alu.setDias(alumno.getDias());
+					alu.setPass(alumno.getPass());
+					return true;
+				}
+			}
 		}
 		return false;
 	}
@@ -234,6 +268,10 @@ class SistemaPrestamo{
 	private void menu(Alumno alumno){
 		Scanner sc = new Scanner(System.in);
 		Bibliotecario biblio = new Bibliotecario();
+		biblio.libreria = new Files().leerArchivoL("librosdisp.bin");
+		
+		System.out.println("\nHola "+alumno.getNombre()+", binevenido a la biblioteca.");
+		System.out.println(alumno);
 
 		System.out.println("\nEliga una opción:\n");
 		System.out.println("1. Préstamo de libro.");
@@ -271,7 +309,10 @@ class SistemaPrestamo{
 				case 3:
 					break;
 				case 4:
+					new Files().escribirArchivoL("librosdisp.bin", biblio.libreria);
+					break;
 			}
+			break;
 		}
 	}
 
@@ -280,6 +321,9 @@ class SistemaPrestamo{
 		Scanner sc = new Scanner(System.in);
 		Alumno alu = new Alumno();
 		Files file = new Files();
+
+
+		sys.alumnosAlta = file.leerArchivo("alumnos.bin");
 
 		for(;;){
 			System.out.println("\nHola, bienvenido a la biblioteca.");
@@ -293,11 +337,11 @@ class SistemaPrestamo{
 			switch(opcion){
 				case 1:
 					System.out.print("Introduzca su numero de cuenta: ");
-					alu.setNombre(sc.next());
+					int numCuenta = sc.nextInt();
 					System.out.print("\nIntroduzca su contraseña: ");
-					alu.setPass(sc.next());
+					String pass = sc.next();
 
-					if(sys.iniciarSesion(alu)){
+					if(sys.iniciarSesion(numCuenta, pass, alu)){
 						sys.menu(alu);
 						break;
 					} else {
@@ -323,7 +367,7 @@ class SistemaPrestamo{
 				case 3:
 					sc.close();
 
-					file.escribirArchivo("alumnos", sys.alumnosAlta);
+					file.escribirArchivo("alumnos.bin", sys.alumnosAlta);
 
 					System.exit(1);
 				default:
