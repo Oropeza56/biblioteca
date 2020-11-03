@@ -1,9 +1,10 @@
-/**
- * Práctica 5 -- Programación Orientada a Objetos
- * 
- * Piña Rossette Marco Antonio.
- * 
- */
+/** 
+* Piña Rossette Marco Antonio
+*
+* Oropeza Sanchez Guadalupe Monserrat
+*
+*/
+
 
 
 import java.util.*;
